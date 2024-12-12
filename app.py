@@ -51,10 +51,10 @@ class Payroll(db.Model):
 
 @app.route('/')
 def home():
-    return render_template('login.html')  # Redirect to login page
+    return render_template('index.html')  # Redirect to login page
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/index', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -75,19 +75,19 @@ def login():
         
         flash('Invalid credentials. Please try again.', 'danger')
     
-    return render_template('login.html')
+    return render_template('index.html')
 
 @app.route('/admin_dashboard')
 def admin_dashboard():
     if 'user_id' not in session or session['role'] != 'Admin':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     return render_template('admin_dashboard.html')
 
 @app.route('/employee_dashboard')
 def employee_dashboard():
     if 'user_id' not in session or session['role'] != 'Employee':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     return render_template('employee_dashboard.html')
 
@@ -95,7 +95,7 @@ def employee_dashboard():
 @app.route('/manage_leaves', methods=['GET', 'POST'])
 def manage_leaves():
     if 'user_id' not in session or session['role'] != 'Admin':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     leave_requests = LeaveRequest.query.all()
     
@@ -119,7 +119,7 @@ def manage_leaves():
 @app.route('/payroll')
 def payroll():
     if 'user_id' not in session or session['role'] != 'Employee':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     employee_id = session['user_id']
     payroll_data = Payroll.query.filter_by(employee_id=employee_id).all()
@@ -130,7 +130,7 @@ def payroll():
 @app.route('/manage_payroll', methods=['GET', 'POST'])
 def manage_payroll():
     if 'user_id' not in session or session['role'] != 'Admin':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     payroll_data = Payroll.query.all()
     
@@ -156,7 +156,7 @@ def manage_payroll():
 @app.route('/leave_request', methods=['GET', 'POST'])
 def leave_request():
     if 'user_id' not in session or session['role'] != 'Employee':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     if request.method == 'POST':
         leave_type = request.form['leave_type']
@@ -176,7 +176,7 @@ def leave_request():
 @app.route('/view_employees')
 def view_employees():
     if 'user_id' not in session or session['role'] != 'Admin':
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     employees = Employee.query.all()
     return render_template('view_employees.html', employees=employees)
@@ -190,7 +190,7 @@ def download_payslip(payroll_id):
     # Ensure the user is logged in by checking session
     if 'user_id' not in session:
         flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('login'))  # Redirect to login page if not logged in
+        return redirect(url_for('index'))  # Redirect to login page if not logged in
 
     # Fetch the payroll record by ID
     payroll = Payroll.query.get(payroll_id)
@@ -219,7 +219,7 @@ def download_payslip(payroll_id):
 def logout():
     session.pop('user_id', None)
     session.pop('role', None)
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 # Start the Flask app
 if __name__ == '__main__':
